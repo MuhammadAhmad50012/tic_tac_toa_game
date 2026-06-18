@@ -1,0 +1,270 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&display=swap');
+
+  .ttt-wrap {
+    min-height: 560px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .ttt-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    letter-spacing: 4px;
+    color: var(--color-text-primary);
+    margin: 0 0 4px;
+    line-height: 1;
+  }
+
+  .ttt-score {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+    margin-bottom: 12px;
+  }
+
+  .ttt-score-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .ttt-score-val {
+    font-size: 22px;
+    font-family: 'Bebas Neue', sans-serif;
+    color: var(--color-text-primary);
+    line-height: 1;
+  }
+
+  .ttt-score-item.x-score .ttt-score-val { color: #185FA5; }
+  .ttt-score-item.o-score .ttt-score-val { color: #993C1D; }
+
+  .ttt-divider {
+    width: 1px;
+    height: 32px;
+    background: #ccc;
+  }
+
+  .ttt-status {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    margin: 0 0 20px;
+    height: 18px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .ttt-board {
+    display: grid;
+    grid-template-columns: repeat(3, 96px);
+    grid-template-rows: repeat(3, 96px);
+    gap: 6px;
+    margin-bottom: 28px;
+    background: #d0d0d0;
+    padding: 6px;
+    border-radius: 14px;
+  }
+
+  .ttt-cell {
+    width: 96px;
+    height: 96px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 54px;
+    line-height: 1;
+    transition: background 0.12s, transform 0.1s;
+    user-select: none;
+    color: transparent;
+  }
+
+  .ttt-cell:hover:not(.taken) {
+    background: #ffffff;
+    transform: scale(1.04);
+  }
+
+  .ttt-cell.x { color: #185FA5; }
+  .ttt-cell.o { color: #993C1D; }
+
+  .ttt-cell.win {
+    background: #dbeeff;
+  }
+  .ttt-cell.win.o {
+    background: #ffeadf;
+  }
+
+  .ttt-cell .mark {
+    display: block;
+    animation: popIn 0.2s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    transform: scale(0);
+  }
+
+  @keyframes popIn {
+    to { transform: scale(1); }
+  }
+
+  .ttt-footer {
+    display: flex;
+    gap: 12px;
+  }
+
+  .ttt-btn {
+    padding: 8px 20px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: transparent;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #666;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+  }
+
+  .ttt-btn:hover {
+    background: #f0f0f0;
+    color: #222;
+  }
+
+  .ttt-btn:active { transform: scale(0.97); }
+</style>
+
+<h2 class="sr-only">Tic Tac Toe — two-player game on a 3×3 grid</h2>
+
+<div class="ttt-wrap">
+  <div class="ttt-title">TIC TAC TOE</div>
+
+  <div class="ttt-score">
+    <div class="ttt-score-item x-score">
+      <span class="ttt-score-val" id="score-x">0</span>
+      <span>X wins</span>
+    </div>
+    <div class="ttt-divider"></div>
+    <div class="ttt-score-item">
+      <span class="ttt-score-val" id="score-d">0</span>
+      <span>draws</span>
+    </div>
+    <div class="ttt-divider"></div>
+    <div class="ttt-score-item o-score">
+      <span class="ttt-score-val" id="score-o">0</span>
+      <span>O wins</span>
+    </div>
+  </div>
+
+  <div class="ttt-status" id="status">X's turn</div>
+
+  <div class="ttt-board" id="board">
+    <div class="ttt-cell" data-i="0"></div>
+    <div class="ttt-cell" data-i="1"></div>
+    <div class="ttt-cell" data-i="2"></div>
+    <div class="ttt-cell" data-i="3"></div>
+    <div class="ttt-cell" data-i="4"></div>
+    <div class="ttt-cell" data-i="5"></div>
+    <div class="ttt-cell" data-i="6"></div>
+    <div class="ttt-cell" data-i="7"></div>
+    <div class="ttt-cell" data-i="8"></div>
+  </div>
+
+  <div class="ttt-footer">
+    <button class="ttt-btn" id="btn-reset">New game</button>
+    <button class="ttt-btn" id="btn-clear">Clear scores</button>
+  </div>
+</div>
+
+<script>
+const WINS = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+let board = Array(9).fill(null);
+let current = 'X';
+let gameOver = false;
+let scores = {X:0, O:0, D:0};
+
+const cells = document.querySelectorAll('.ttt-cell');
+const status = document.getElementById('status');
+const scoreX = document.getElementById('score-x');
+const scoreO = document.getElementById('score-o');
+const scoreD = document.getElementById('score-d');
+
+function checkWin(b, p) {
+  return WINS.find(([a,c,d]) => b[a]===p && b[c]===p && b[d]===p) || null;
+}
+
+function render() {
+  cells.forEach((cell, i) => {
+    const val = board[i];
+    cell.className = 'ttt-cell' + (val ? ' taken' : '');
+    if (val) cell.classList.add(val.toLowerCase());
+    cell.innerHTML = val ? `<span class="mark">${val}</span>` : '';
+  });
+}
+
+function highlight(line) {
+  line.forEach(i => cells[i].classList.add('win'));
+}
+
+function handleClick(i) {
+  if (gameOver || board[i]) return;
+  board[i] = current;
+  render();
+
+  const winLine = checkWin(board, current);
+  if (winLine) {
+    highlight(winLine);
+    status.textContent = `${current} wins!`;
+    scores[current]++;
+    updateScores();
+    gameOver = true;
+    return;
+  }
+
+  if (board.every(Boolean)) 
+  {
+    status.textContent = "It's a draw!";
+    scores.D++;
+    updateScores();
+    gameOver = true;
+    return;
+  }
+  current = current === 'X' ? 'O' : 'X';
+  status.textContent = `${current}'s turn`;
+}
+
+function updateScores() 
+{
+  scoreX.textContent = scores.X;
+  scoreO.textContent = scores.O;
+  scoreD.textContent = scores.D;
+}
+function reset() 
+{
+  board = Array(9).fill(null);
+  current = 'X';
+  gameOver = false;
+  status.textContent = "X's turn";
+  render();
+}
+cells.forEach(cell => {
+  cell.addEventListener('click', () => handleClick(+cell.dataset.i));
+});
+
+document.getElementById('btn-reset').addEventListener('click', reset);
+document.getElementById('btn-clear').addEventListener('click', () => {
+  scores = {X:0, O:0, D:0};
+  updateScores();
+  reset();
+});
+</script>
