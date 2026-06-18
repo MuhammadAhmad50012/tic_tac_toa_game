@@ -259,7 +259,7 @@ function reset()
 }
 cells.forEach(cell => {
   cell.addEventListener('click', () => handleClick(+cell.dataset.i));
-});
+});     
 
 document.getElementById('btn-reset').addEventListener('click', reset);
 document.getElementById('btn-clear').addEventListener('click', () => {
